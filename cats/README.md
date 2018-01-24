@@ -187,3 +187,51 @@ best tradeoff for its cost and run time.
 
 Run `step_8_to_9.ipynb` to train a model, do some basic debugging, and run
 validation and testing on the entire dataset.
+
+## Step 10: Serving the Model
+
+Run `step_10.ipynb` to generate a model for serving. The model will be written
+into a directory `/home/<user_name>/data/serving_cnn_model/<version>`, where
+`<version>` by default is the unix timestamp of when the serving model was
+created.
+
+Next, start up your server by executing:
+
+```
+tensorflow_model_server --port=9000 --model_config_file=$HOME/data/serving_cnn_model
+```
+
+To test it directly from your VM, make sure you have screen enabled.
+Type `ctrl-a c` to create a new terminal. Then run the following:
+
+``` 
+~/sc17/cats
+```
+
+Find a sample image locally, or by URL, and run the client:
+
+```
+python step_10_cat_client.py --image [path-or-url-of-image]
+```
+
+(Note that this client only works for 3-color images.)
+
+If you would like to try serving the VM to your local machine/laptop, make sure
+you have python installed. Create a virtual environment and install requirements
+on your local machine, e.g. `pip install -r [path-to-sc17]/requirements.txt`.
+This installs all the required libraries to run the client (and more).
+
+Now run an ssh tunnel to your VM as you did when enabling jupyter access.
+Since we are using port 9000 remotely to serve our model, make sure to setup
+tunneling to that port. For simplicity, the following tunnels remote port 9000
+to local port 9000:
+
+```
+ssh -N -f -L localhost:9000:localhost:9000 [instance-name].[zone-name].[project-name]
+```
+
+Now run your cat client on your local machine.
+
+```
+python step_10_cat_client.py --image [path-or-url-of-image]
+```

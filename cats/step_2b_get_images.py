@@ -191,22 +191,20 @@ def filter_bad_or_missing_image(img_and_metadata):
   return False
 
 
-def resize_and_pad(img_and_metadata, output_image_dim=128):
+def resize_and_pad_image(img, output_image_dim=128):
   """Resize the image to make it IMAGE_DIM x IMAGE_DIM pixels in size.
 
   If an image is not square, it will pad the top/bottom or left/right
   with black pixels to ensure the image is square.
 
   Args:
-    img_and_metadata: row containing a dictionary of the input image along with
-                      its index, label, and randnum
+    img: the input 3-color image
+    output_image_dim: resized and padded output length (and width)
 
   Returns:
-    dictionary with same values as input dictionary,
-      but with image resized and padded
+    resized and padded image
   """
 
-  img = img_and_metadata[IMAGE_KEY]
   h, w = img.shape[:2]
 
   # interpolation method
@@ -243,10 +241,26 @@ def resize_and_pad(img_and_metadata, output_image_dim=128):
   scaled_img = cv2.copyMakeBorder(scaled_img,
                                   pad_top, pad_bot, pad_left, pad_right,
                                   borderType=cv2.BORDER_CONSTANT, value=0)
+  return scaled_img
+
+def resize_and_pad(img_and_metadata, output_image_dim=128):
+  """Resize the image to make it IMAGE_DIM x IMAGE_DIM pixels in size.
+
+  Reads the row, parses out the image, and resizes and pads the image using
+  resize_and_pad_image() function.
+
+  Args:
+    img_and_metadata: row containing a dictionary of the input image along with
+                      its index, label, and randnum
+
+  Returns:
+    dictionary with same values as input dictionary,
+      but with image resized and padded
+  """
 
   return {
       INDEX_KEY: img_and_metadata[INDEX_KEY],
-      IMAGE_KEY: scaled_img,
+      IMAGE_KEY: resize_and_pad(img_and_metadata[IMAGE_KEY], output_image_dim),
       LABEL_KEY: img_and_metadata[LABEL_KEY],
       RAND_KEY: img_and_metadata[RAND_KEY]
   }

@@ -53,6 +53,8 @@ sudo apt-get install -y \
   libxext6 \
   || err 'failed to install opencv dependencies'
 
+
+#### GPU Machine Installations ####
 # If we are using a GPU machine, install cuda libraries
 if [ -n "$LSPCI_OUTPUT" ]; then
   # The 16.04 installer works with 16.10.
@@ -99,6 +101,34 @@ if [ -n "$LSPCI_OUTPUT" ]; then
     || err 'failed to install cuda profiler tools'
 fi
 
+
+#### Tensorflow Serving Binary Installation ####
+# Prerequisites
+sudo apt-get update && sudo apt-get install -y \
+        build-essential \
+        curl \
+        libcurl3-dev \
+        git \
+        libfreetype6-dev \
+        libpng12-dev \
+        libzmq3-dev \
+        pkg-config \
+        python-dev \
+        python-numpy \
+        python-pip \
+        software-properties-common \
+        swig \
+        zip \
+        zlib1g-dev
+
+# Binary Installation
+sudo apt-get remove tensorflow-model-server  # In case previous installation exists
+echo "deb [arch=amd64] http://storage.googleapis.com/tensorflow-serving-apt stable tensorflow-model-server tensorflow-model-server-universal" \
+  | sudo tee /etc/apt/sources.list.d/tensorflow-serving.list
+curl https://storage.googleapis.com/tensorflow-serving-apt/tensorflow-serving.release.pub.gpg \
+  | sudo apt-key add -
+sudo apt-get update && sudo apt-get install tensorflow-model-server
+sudo apt-get upgrade tensorflow-model-server
 
 #### Python Virtual Environment Setup ####
 
